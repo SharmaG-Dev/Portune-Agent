@@ -43,16 +43,12 @@ func (a *Agent) Run(ctx context.Context) error {
 
 	options := socketio.DefaultOptions()
 
-	// Force WebSocket transport.
 	options.SetTransports(
 		types.NewSet(
 			socketio.WebSocket,
 		),
 	)
 
-	// Token gets sent as:
-	//
-	// socket.handshake.auth.token
 	options.SetAuth(
 		map[string]any{
 			"token":     a.config.Token,
@@ -144,7 +140,6 @@ func (a *Agent) registerEvents() {
 				}
 			}
 
-			// Only create tunnel after successful auth.
 			a.createTunnel()
 		},
 	)
@@ -207,7 +202,6 @@ func (a *Agent) registerEvents() {
 				return
 			}
 
-			// Each HTTP request can be processed concurrently.
 			go a.handleHTTPRequest(payload)
 		},
 	)
