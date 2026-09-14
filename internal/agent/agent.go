@@ -36,9 +36,8 @@ func (a *Agent) Run(ctx context.Context) error {
 	fmt.Println("Server :", a.config.ServerURL)
 	fmt.Println("Target :", a.config.LocalTarget)
 
-	if a.config.Subdomain != "" {
-		fmt.Println("Subdomain :", a.config.Subdomain)
-	}
+	fmt.Println("Agent :", a.config.AgentName)
+	fmt.Println("Local IP :", a.config.AgentIP)
 
 	fmt.Println()
 
@@ -56,7 +55,9 @@ func (a *Agent) Run(ctx context.Context) error {
 	// socket.handshake.auth.token
 	options.SetAuth(
 		map[string]any{
-			"token": a.config.Token,
+			"token":     a.config.Token,
+			"agentName": a.config.AgentName,
+			"agentIp":   a.config.AgentIP,
 		},
 	)
 
@@ -107,6 +108,15 @@ func (a *Agent) registerEvents() {
 		"authenticated",
 		func(args ...any) {
 
+			if len(args) == 0 {
+				fmt.Println("✗ Missing authentication response")
+				return
+			}
+			data, ok := args[0].(map[string]any)
+			if !ok || data["ok"] != true {
+				fmt.Println("✗ Agent authentication failed")
+				return
+			}
 			fmt.Println("✓ Agent authenticated")
 
 			if len(args) > 0 {
@@ -206,8 +216,7 @@ func (a *Agent) registerEvents() {
 func (a *Agent) createTunnel() {
 
 	payload := TunnelCreateRequest{
-		RequestedSubdomain: a.config.Subdomain,
-		Name:               a.config.TunnelName,
+		Name: a.config.TunnelName,
 	}
 
 	fmt.Println()

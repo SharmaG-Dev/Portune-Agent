@@ -7,7 +7,9 @@ type Config struct {
 
 	LocalTarget string
 
-	Subdomain string
+	AgentIP string
+
+	AgentName string
 
 	TunnelName string
 }
@@ -19,8 +21,7 @@ type AuthenticationResponse struct {
 }
 
 type TunnelCreateRequest struct {
-	RequestedSubdomain string `json:"requestedSubdomain,omitempty"`
-	Name               string `json:"name,omitempty"`
+	Name string `json:"name"`
 }
 
 type TunnelCreateResponse struct {

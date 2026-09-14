@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"context"
-	"fmt"
-	"os"
 	"os/signal"
 	"syscall"
 
@@ -11,145 +8,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	serverURL string
-
-	agentToken string
-
-	localTarget string
-
-	requestedSubdomain string
-
-	tunnelName string
-)
+var localTarget string
 
 var agentCmd = &cobra.Command{
-	Use:   "agent",
+	Use:   "agent --target <local-url>",
 	Short: "Start Portune tunnel agent",
-
-	RunE: func(
-		cmd *cobra.Command,
-		args []string,
-	) error {
-
-		if agentToken == "" {
-
-			agentToken =
-				os.Getenv(
-					"PORTUNE_AGENT_TOKEN",
-				)
+	Args:  cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		config, err := agent.LoadConfig(".env", localTarget)
+		if err != nil {
+			return err
 		}
-
-		if agentToken == "" {
-
-			return fmt.Errorf(
-				"agent token is required: use --token or PORTUNE_AGENT_TOKEN",
-			)
-		}
-
-		if serverURL == "" {
-
-			return fmt.Errorf(
-				"Portune server URL is required",
-			)
-		}
-
-		if localTarget == "" {
-
-			return fmt.Errorf(
-				"local target is required",
-			)
-		}
-
-		ctx,
-			cancel :=
-			signal.NotifyContext(
-				context.Background(),
-
-				os.Interrupt,
-
-				syscall.SIGTERM,
-			)
-
+		ctx, cancel := signal.NotifyContext(cmd.Context(), syscall.SIGINT, syscall.SIGTERM)
 		defer cancel()
-
-		portuneAgent :=
-			agent.New(
-				agent.Config{
-					ServerURL: serverURL,
-
-					Token: agentToken,
-
-					LocalTarget: localTarget,
-
-					Subdomain: requestedSubdomain,
-
-					TunnelName: tunnelName,
-				},
-			)
-
-		return portuneAgent.Run(ctx)
+		return agent.New(config).Run(ctx)
 	},
 }
 
 func init() {
-
-	rootCmd.AddCommand(
-		agentCmd,
-	)
-
-	agentCmd.Flags().
-		StringVar(
-			&serverURL,
-
-			"server",
-
-			"http://localhost:3000/tunnel",
-
-			"Portune tunnel server URL",
-		)
-
-	agentCmd.Flags().
-		StringVar(
-			&agentToken,
-
-			"token",
-
-			"",
-
-			"Portune agent authentication token",
-		)
-
-	agentCmd.Flags().
-		StringVar(
-			&localTarget,
-
-			"target",
-
-			"http://localhost:4000",
-
-			"Local application URL",
-		)
-
-	agentCmd.Flags().
-		StringVar(
-			&requestedSubdomain,
-
-			"subdomain",
-
-			"",
-
-			"Requested public subdomain",
-		)
-
-	agentCmd.Flags().
-		StringVar(
-			&tunnelName,
-
-			"name",
-
-			"",
-
-			"Tunnel name",
-		)
+	rootCmd.AddCommand(agentCmd)
+	agentCmd.Flags().StringVar(&localTarget, "target", "", "Local application URL (required)")
+	_ = agentCmd.MarkFlagRequired("target")
 }
