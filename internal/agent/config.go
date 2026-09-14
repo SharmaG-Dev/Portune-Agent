@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-// LoadConfig reads deployment settings from a file; process environment wins.
 func LoadConfig(path, target string) (Config, error) {
 	values, err := readEnv(path)
 	if err != nil {
@@ -65,8 +64,6 @@ func validateURL(raw string) (*url.URL, error) {
 	return u, nil
 }
 
-// localIP prefers an active private IPv4 address, then another unicast address.
-// This is machine metadata, not the public IP seen by the server or an identity key.
 func localIP() (string, error) {
 	interfaces, err := net.Interfaces()
 	if err != nil {
@@ -100,8 +97,6 @@ func localIP() (string, error) {
 	return "", fmt.Errorf("cannot detect a non-loopback local IP; connect to a network before starting the agent")
 }
 
-// readEnv supports one KEY=value per line, optional export, comments and quoted
-// values. It deliberately does not execute shell code or expand variables.
 func readEnv(path string) (map[string]string, error) {
 	values := make(map[string]string)
 	f, err := os.Open(path)
