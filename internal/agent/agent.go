@@ -30,7 +30,7 @@ func New(config Config) *Agent {
 
 func (a *Agent) Run(ctx context.Context) error {
 	fmt.Println()
-	fmt.Println("Portune Agent")
+	fmt.Println("Tunnexo Agent")
 	fmt.Println("================================")
 
 	fmt.Println("Server :", a.config.ServerURL)
@@ -64,7 +64,7 @@ func (a *Agent) Run(ctx context.Context) error {
 
 	if err != nil {
 		return fmt.Errorf(
-			"failed to connect to Portune server: %w",
+			"failed to connect to Tunnexo server: %w",
 			err,
 		)
 	}
@@ -76,11 +76,11 @@ func (a *Agent) Run(ctx context.Context) error {
 	<-ctx.Done()
 
 	fmt.Println()
-	fmt.Println("Stopping Portune Agent...")
+	fmt.Println("Stopping Tunnexo Agent...")
 
 	a.socket.Disconnect()
 
-	fmt.Println("Portune Agent stopped.")
+	fmt.Println("Tunnexo Agent stopped.")
 
 	return nil
 }
@@ -91,7 +91,7 @@ func (a *Agent) registerEvents() {
 		"connect",
 		func(args ...any) {
 
-			fmt.Println("✓ Connected to Portune Server")
+			fmt.Println("✓ Connected to Tunnexo Server")
 
 			fmt.Println(
 				"  Socket ID:",

@@ -147,7 +147,7 @@ func (a *Agent) handleHTTPRequest(
 			string(responseBody)
 	}
 
-	portuneResponse :=
+	tunnexoResponse :=
 		HTTPResponse{
 			RequestID: requestData.RequestID,
 
@@ -163,7 +163,7 @@ func (a *Agent) handleHTTPRequest(
 	if err :=
 		a.socket.Emit(
 			"http:response",
-			portuneResponse,
+			tunnexoResponse,
 		); err != nil {
 
 		fmt.Printf(
